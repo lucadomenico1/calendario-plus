@@ -315,6 +315,18 @@ document.addEventListener('DOMContentLoaded', () => {
                 } else {
                     examName = textBeforeYear;
                 }
+
+                // Fix text extraction bugs for multi-line subjects
+                const upperName = examName.toUpperCase().trim();
+                if (upperName === "ARCHITETTURA DEGLI") {
+                    examName = "ARCHITETTURA DEGLI ELABORATORI";
+                } else if (upperName === "PROGRAMMAZIONE OBJECT") {
+                    examName = "PROGRAMMAZIONE OBJECT ORIENTED";
+                } else if (upperName === "PROGRAMMAZIONESTRUT") {
+                    examName = "PROGRAMMAZIONE STRUTTURATA E STRUTTURE DATI";
+                } else if (upperName === "PROGRAMMAZIONE AND") {
+                    examName = "PROGRAMMAZIONE E ALGORITMI";
+                }
             } else {
                 const capsMatch = currentExamInfo.match(/([A-ZÀ-Ú\']{4,}(?:\s+[A-ZÀ-Ú\']{2,})*)/g);
                 if (capsMatch && capsMatch.length > 0) {
