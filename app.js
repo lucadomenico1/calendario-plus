@@ -4,9 +4,8 @@ document.addEventListener('DOMContentLoaded', () => {
     pdfjsLib.GlobalWorkerOptions.workerSrc = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js';
 
     // DOM Elements
-    const uploadInput = document.getElementById('pdf-upload');
-    const uploadStatus = document.getElementById('upload-status');
     const uploadSection = document.getElementById('upload-section');
+    const uploadStatus = document.getElementById('upload-status');
     const searchSection = document.getElementById('search-section');
     const subjectInput = document.getElementById('subject-input');
     const autocompleteList = document.getElementById('autocomplete-list');
@@ -18,7 +17,6 @@ document.addEventListener('DOMContentLoaded', () => {
     const appelliList = document.getElementById('appelli-list');
     
     const savedExamsList = document.getElementById('saved-exams-list');
-    const changeFileBtn = document.getElementById('change-file-btn');
 
     // Manual form elements
     const showManualFormBtn = document.getElementById('show-manual-form-btn');
@@ -26,19 +24,39 @@ document.addEventListener('DOMContentLoaded', () => {
     const saveManualBtn = document.getElementById('save-manual-btn');
     const cancelManualBtn = document.getElementById('cancel-manual-btn');
 
-    let allExams = JSON.parse(localStorage.getItem('calendarioPlusAllExams')) || []; 
-    let groupedExams = {}; // { "MATERIA": { "PROFESSORE": [ appello1, appello2 ] } }
+    let allExams = []; 
+    let groupedExams = {}; 
     let savedExams = JSON.parse(localStorage.getItem('calendarioPlusExams')) || [];
 
     // Initialize
     renderSavedExams();
     setInterval(renderSavedExams, 60000); 
 
-    if (allExams.length > 0) {
-        buildGroupedExams();
-        uploadSection.classList.add('hidden');
-        searchSection.classList.remove('hidden');
+    // Auto-load PDF on startup
+    async function loadDatabase() {
+        try {
+            uploadStatus.textContent = 'Scaricamento e lettura del database in corso...';
+            const response = await fetch('./ttPdf.pdf');
+            if (!response.ok) throw new Error("PDF non trovato sul server.");
+            const arrayBuffer = await response.arrayBuffer();
+            
+            const text = await extractTextFromPDF(arrayBuffer);
+            allExams = parseTextToExams(text);
+            buildGroupedExams();
+            
+            uploadStatus.textContent = `Database caricato: ${allExams.length} appelli pronti!`;
+            setTimeout(() => {
+                uploadSection.classList.add('hidden');
+                searchSection.classList.remove('hidden');
+            }, 800);
+        } catch (error) {
+            console.error(error);
+            uploadStatus.textContent = 'Errore durante l\'inizializzazione del database. Ricarica la pagina.';
+        }
     }
+
+    // Avvia caricamento al lancio
+    window.addEventListener('DOMContentLoaded', loadDatabase);
 
     // Manual form logic
     showManualFormBtn.addEventListener('click', () => {
@@ -75,7 +93,8 @@ document.addEventListener('DOMContentLoaded', () => {
             ora: timeVal,
             aula: roomVal,
             appelloDetails: 'Prova Intercorso aggiunta manualmente',
-            timestamp: parsedDate.getTime()
+            timestamp: parsedDate.getTime(),
+            isManual: true
         };
 
         saveExam(customExam);
@@ -89,47 +108,10 @@ document.addEventListener('DOMContentLoaded', () => {
         document.getElementById('manual-room').value = '';
     });
 
-    changeFileBtn.addEventListener('click', () => {
-        uploadSection.classList.remove('hidden');
-        searchSection.classList.add('hidden');
-        uploadInput.value = '';
-        uploadStatus.textContent = '';
-        allExams = [];
-        localStorage.removeItem('calendarioPlusAllExams');
-    });
-
     // Close autocomplete when clicking outside
     document.addEventListener("click", function (e) {
         if (e.target !== subjectInput && e.target !== autocompleteList) {
             autocompleteList.innerHTML = '';
-        }
-    });
-
-    // File Upload Handler
-    uploadInput.addEventListener('change', async (e) => {
-        const file = e.target.files[0];
-        if (!file || file.type !== 'application/pdf') {
-            uploadStatus.textContent = 'Per favore, carica un file PDF valido.';
-            return;
-        }
-
-        uploadStatus.textContent = 'Lettura del PDF in corso... Attendi qualche secondo.';
-        
-        try {
-            const arrayBuffer = await file.arrayBuffer();
-            const text = await extractTextFromPDF(arrayBuffer);
-            allExams = parseTextToExams(text);
-            localStorage.setItem('calendarioPlusAllExams', JSON.stringify(allExams));
-            buildGroupedExams();
-            
-            uploadStatus.textContent = `File caricato con successo! Trovati ${allExams.length} appelli.`;
-            setTimeout(() => {
-                uploadSection.classList.add('hidden');
-                searchSection.classList.remove('hidden');
-            }, 1000);
-        } catch (error) {
-            console.error(error);
-            uploadStatus.textContent = 'Errore durante la lettura del PDF.';
         }
     });
 

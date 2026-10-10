@@ -22,25 +22,22 @@
     </header>
 
     <main class="container">
-        <!-- Upload Section -->
-        <section id="upload-section" class="card">
-            <h2>1. Carica il Calendario (PDF)</h2>
-            <div class="upload-area">
-                <input type="file" id="pdf-upload" accept="application/pdf">
-                <label for="pdf-upload" class="upload-label">
-                    <span class="icon">📄</span>
-                    <span>Scegli un file PDF o trascinalo qui</span>
-                </label>
+        <!-- Loading Section -->
+        <section id="upload-section" class="card" style="text-align: center;">
+            <div class="upload-area" style="border: none; background: transparent;">
+                <div class="upload-label">
+                    <span class="icon">🔄</span>
+                    <span style="font-size: 1.3rem;">Inizializzazione database...</span>
+                </div>
+                <p id="upload-status" style="margin-top: 15px; color: var(--inner-red); font-weight: 800; font-size: 1.1rem;">Caricamento appelli in corso...</p>
             </div>
-            <p id="upload-status"></p>
         </section>
 
         <div class="dashboard">
             <!-- Search Section -->
             <section id="search-section" class="card hidden">
-                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px;">
+                <div style="display: flex; justify-content: center; align-items: center; margin-bottom: 20px;">
                     <h2 style="margin: 0;">Cerca e Seleziona</h2>
-                    <button id="change-file-btn" class="btn btn-danger" style="width: auto; padding: 6px 12px; font-size: 0.85rem; margin-top: 0;">Cambia PDF</button>
                 </div>
                 
                 <div class="form-group">
