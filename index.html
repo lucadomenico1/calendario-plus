@@ -1,0 +1,97 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Calendario Esami PLUS</title>
+    <link rel="stylesheet" href="style.css">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+</head>
+<body>
+    <header>
+        <div class="container header-content">
+            <div class="logo-title">
+                <img src="logo.png" alt="Logo" class="app-logo">
+                <div>
+                    <h1>Calendario Esami PLUS</h1>
+                    <p>Organizza, cerca e salva i tuoi appelli</p>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <main class="container">
+        <!-- Upload Section -->
+        <section id="upload-section" class="card">
+            <h2>1. Carica il Calendario (PDF)</h2>
+            <div class="upload-area">
+                <input type="file" id="pdf-upload" accept="application/pdf">
+                <label for="pdf-upload" class="upload-label">
+                    <span class="icon">📄</span>
+                    <span>Scegli un file PDF o trascinalo qui</span>
+                </label>
+            </div>
+            <p id="upload-status"></p>
+        </section>
+
+        <div class="dashboard">
+            <!-- Search Section -->
+            <section id="search-section" class="card hidden">
+                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px;">
+                    <h2 style="margin: 0;">Cerca e Seleziona</h2>
+                    <button id="change-file-btn" class="btn btn-danger" style="width: auto; padding: 6px 12px; font-size: 0.85rem; margin-top: 0;">Cambia PDF</button>
+                </div>
+                
+                <div class="form-group">
+                    <label>1. Cerca la materia</label>
+                    <div class="autocomplete">
+                        <input type="text" id="subject-input" placeholder="Es. Algoritmi Avanzati..." autocomplete="off">
+                        <div id="autocomplete-list" class="autocomplete-items"></div>
+                    </div>
+                </div>
+
+                <div id="professors-container" class="form-group hidden" style="margin-top: 20px;">
+                    <label>2. Seleziona il professore</label>
+                    <div id="professors-list" class="chips-container"></div>
+                </div>
+
+                <div id="appelli-container" class="form-group hidden" style="margin-top: 20px;">
+                    <label>3. Scegli l'appello</label>
+                    <div id="appelli-list" class="results-container" style="margin-top: 10px;"></div>
+                </div>
+            </section>
+
+            <!-- Saved Exams Section -->
+            <section id="saved-exams-section" class="card">
+                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
+                    <h2 style="margin: 0;">I Tuoi Esami</h2>
+                    <button id="show-manual-form-btn" class="btn" style="width: auto; padding: 8px 14px; font-size: 0.85rem; margin: 0; box-shadow: none;">+ Intercorso</button>
+                </div>
+
+                <!-- Manual Form -->
+                <div id="manual-exam-form" class="hidden" style="background: var(--white); padding: 20px; border-radius: 20px; margin-bottom: 20px; box-shadow: 0 4px 10px rgba(0,0,0,0.05);">
+                    <h3 style="margin-bottom: 15px; color: var(--text-dark-red); font-family: 'Fredoka', sans-serif; font-size: 1.2rem;">Aggiungi Prova Intercorso</h3>
+                    <input type="text" id="manual-exam-name" placeholder="Nome Materia" class="custom-input">
+                    <input type="text" id="manual-prof-name" placeholder="Professore (Opzionale)" class="custom-input">
+                    <div style="display: flex; gap: 10px; margin-top: 5px;">
+                        <input type="date" id="manual-date" class="custom-input" style="flex: 1;">
+                        <input type="time" id="manual-time" class="custom-input" style="flex: 1;">
+                    </div>
+                    <input type="text" id="manual-room" placeholder="Aula o Note (Opzionale)" class="custom-input" style="margin-top: 5px;">
+                    <div style="display: flex; gap: 10px; margin-top: 15px;">
+                        <button id="save-manual-btn" class="btn" style="background: var(--inner-red); color: white;">Salva</button>
+                        <button id="cancel-manual-btn" class="btn btn-danger">Annulla</button>
+                    </div>
+                </div>
+
+                <div id="saved-exams-list" class="saved-container">
+                    <p class="empty-state">Nessun esame salvato.</p>
+                </div>
+            </section>
+        </div>
+    </main>
+
+    <script src="app.js"></script>
+</body>
+</html>

@@ -1,0 +1,430 @@
+@import url('https://fonts.googleapis.com/css2?family=Fredoka:wght@500;600;700&family=Nunito:wght@600;700;800&display=swap');
+
+:root {
+    --bg-red: #cc1c12;        /* Sfondo principale (rosso scuro) */
+    --card-pink: #ffdedb;     /* Colore delle card grandi (rosa pallido) */
+    --inner-red: #ef3d32;     /* Colore delle sub-card esami (rosso acceso) */
+    --text-dark-red: #ba120a; /* Testo rosso scuro sulle card rosa */
+    --text-pink: #ffdedb;     /* Testo rosa sullo sfondo scuro */
+    --white: #ffffff;
+    --shadow: rgba(100, 0, 0, 0.4);
+}
+
+* {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+}
+
+body {
+    font-family: 'Nunito', sans-serif;
+    background-color: var(--bg-red);
+    color: var(--text-pink);
+    line-height: 1.5;
+    -webkit-font-smoothing: antialiased;
+    /* Opzionale: un leggerissimo pattern di sfondo potrebbe essere aggiunto qui */
+}
+
+h1, h2, h3, .chip, .btn {
+    font-family: 'Fredoka', sans-serif;
+}
+
+.container {
+    max-width: 1000px;
+    margin: 0 auto;
+    padding: 0 20px;
+}
+
+/* Header */
+header {
+    padding: 30px 0 20px 0;
+    text-align: center;
+}
+
+.header-content {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+}
+
+.logo-title {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    justify-content: center;
+    gap: 16px;
+}
+
+.app-logo {
+    width: 60px;
+    height: 60px;
+    object-fit: cover;
+    border-radius: 16px;
+    box-shadow: 0 6px 15px var(--shadow);
+}
+
+header h1 {
+    font-size: 2.2rem;
+    font-weight: 700;
+    color: var(--text-pink);
+    letter-spacing: 1px;
+    text-shadow: 0 4px 10px var(--shadow);
+    text-transform: uppercase;
+}
+
+header p {
+    color: var(--card-pink);
+    font-size: 1.1rem;
+    font-weight: 700;
+    margin-top: 4px;
+    opacity: 0.9;
+}
+
+/* Cards (Rosa Pallido) */
+.card {
+    background-color: var(--card-pink);
+    border-radius: 30px;
+    padding: 30px;
+    margin-bottom: 24px;
+    box-shadow: 0 10px 25px var(--shadow);
+    color: var(--text-dark-red);
+}
+
+h2 {
+    font-size: 1.8rem;
+    font-weight: 700;
+    margin-bottom: 20px;
+    color: var(--text-dark-red);
+    text-transform: uppercase;
+    text-align: center;
+    letter-spacing: 1px;
+}
+
+/* Upload Area */
+.upload-area {
+    position: relative;
+    border: 3px dashed var(--inner-red);
+    border-radius: 20px;
+    padding: 30px;
+    text-align: center;
+    background-color: rgba(255, 255, 255, 0.4);
+    transition: all 0.2s ease;
+}
+
+.upload-area:hover {
+    background-color: rgba(255, 255, 255, 0.8);
+}
+
+#pdf-upload {
+    opacity: 0;
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    cursor: pointer;
+}
+
+.upload-label {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 12px;
+    pointer-events: none;
+    color: var(--text-dark-red);
+    font-size: 1.1rem;
+    font-weight: 800;
+}
+
+.upload-label .icon {
+    font-size: 40px;
+}
+
+#upload-status {
+    margin-top: 15px;
+    font-size: 1rem;
+    font-weight: 800;
+    color: var(--inner-red);
+    text-align: center;
+}
+
+/* Dashboard Layout */
+.dashboard {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 24px;
+}
+
+@media (min-width: 800px) {
+    .dashboard {
+        grid-template-columns: 1fr 1fr;
+    }
+}
+
+/* Search Form */
+.form-group label {
+    display: block;
+    font-weight: 800;
+    font-size: 1.1rem;
+    margin-bottom: 8px;
+    color: var(--text-dark-red);
+}
+
+.autocomplete {
+    position: relative;
+    display: block;
+    width: 100%;
+}
+
+#subject-input, .custom-input {
+    width: 100%;
+    padding: 16px 20px;
+    background-color: var(--white);
+    border: 3px solid transparent;
+    border-radius: 20px;
+    font-size: 1.1rem;
+    font-family: 'Nunito', sans-serif;
+    font-weight: 700;
+    color: var(--text-dark-red);
+    transition: all 0.2s ease;
+    box-shadow: inset 0 2px 5px rgba(0,0,0,0.05);
+    margin-bottom: 8px;
+}
+
+#subject-input:focus, .custom-input:focus {
+    outline: none;
+    border-color: var(--inner-red);
+}
+
+.autocomplete-items {
+    position: absolute;
+    border: none;
+    z-index: 99;
+    top: calc(100% + 5px);
+    left: 0;
+    right: 0;
+    background: var(--white);
+    max-height: 250px;
+    overflow-y: auto;
+    border-radius: 16px;
+    box-shadow: 0 10px 20px rgba(0, 0, 0, 0.15);
+}
+
+.autocomplete-items div {
+    padding: 14px 20px;
+    cursor: pointer;
+    border-bottom: 2px solid var(--card-pink);
+    font-size: 1rem;
+    font-weight: 700;
+    color: var(--text-dark-red);
+}
+
+.autocomplete-items div:last-child {
+    border-bottom: none;
+}
+
+.autocomplete-items div:hover {
+    background-color: var(--card-pink);
+}
+
+.autocomplete-items strong {
+    color: var(--inner-red);
+}
+
+/* Chips (Professors) */
+.chips-container {
+    display: flex;
+    gap: 10px;
+    flex-wrap: wrap;
+}
+
+.chip {
+    padding: 10px 20px;
+    background: var(--white);
+    color: var(--text-dark-red);
+    border: none;
+    border-radius: 25px;
+    cursor: pointer;
+    font-size: 1rem;
+    transition: all 0.2s ease;
+    box-shadow: 0 4px 10px rgba(0,0,0,0.05);
+}
+
+.chip:hover {
+    background: #ffe8e6;
+    transform: translateY(-2px);
+}
+
+.chip.active {
+    background: var(--inner-red);
+    color: var(--white);
+    box-shadow: 0 6px 15px rgba(239, 61, 50, 0.4);
+}
+
+/* Results (Le Card interne Rosse) */
+.results-container, .saved-container {
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+    max-height: 600px;
+    overflow-y: auto;
+    padding-right: 5px;
+    padding-bottom: 10px;
+}
+
+.results-container::-webkit-scrollbar, .saved-container::-webkit-scrollbar {
+    width: 8px;
+}
+.results-container::-webkit-scrollbar-thumb, .saved-container::-webkit-scrollbar-thumb {
+    background-color: var(--inner-red);
+    border-radius: 4px;
+}
+
+.result-card, .saved-exam-card {
+    border: none;
+    border-radius: 20px;
+    padding: 24px;
+    background-color: var(--inner-red);
+    color: var(--white);
+    box-shadow: 0 6px 15px rgba(0,0,0,0.1);
+    transition: transform 0.2s ease;
+}
+
+.result-card:hover, .saved-exam-card:hover {
+    transform: translateY(-3px);
+}
+
+.result-card h3, .saved-exam-card h3 {
+    font-size: 1.3rem;
+    color: var(--white);
+    margin-bottom: 14px;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    border-bottom: 2px dashed rgba(255,255,255,0.4);
+    padding-bottom: 12px;
+}
+
+.info-grid {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 10px;
+    margin-bottom: 20px;
+}
+
+.info-grid p {
+    font-size: 1rem;
+    color: var(--white);
+    margin: 0;
+    font-weight: 700;
+}
+
+.info-grid strong {
+    color: var(--card-pink);
+    font-weight: 800;
+    text-transform: uppercase;
+    font-size: 0.85rem;
+    display: block;
+    margin-bottom: 2px;
+}
+
+/* Buttons */
+.btn {
+    display: inline-block;
+    padding: 12px 20px;
+    background-color: var(--card-pink);
+    color: var(--text-dark-red);
+    border: none;
+    border-radius: 15px;
+    font-size: 1.05rem;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    width: 100%;
+    text-align: center;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+}
+
+.btn:hover {
+    background-color: var(--white);
+    transform: translateY(-2px);
+}
+
+.btn-danger {
+    background-color: rgba(255, 255, 255, 0.2);
+    color: var(--white);
+    box-shadow: none;
+}
+
+.btn-danger:hover {
+    background-color: rgba(255, 255, 255, 0.3);
+    color: var(--white);
+}
+
+.btn:disabled {
+    background-color: rgba(255,255,255,0.2);
+    color: rgba(255,255,255,0.6);
+    cursor: not-allowed;
+    box-shadow: none;
+    transform: none;
+}
+
+#change-file-btn {
+    background-color: var(--inner-red);
+    color: var(--white);
+    padding: 8px 16px;
+    border-radius: 12px;
+    font-size: 0.9rem;
+}
+
+#change-file-btn:hover {
+    background-color: var(--bg-red);
+}
+
+/* Countdown */
+.countdown-box {
+    display: flex;
+    gap: 12px;
+    margin: 16px 0;
+}
+
+.cd-item {
+    background-color: var(--white);
+    color: var(--inner-red);
+    padding: 12px;
+    border-radius: 15px;
+    text-align: center;
+    flex: 1;
+    box-shadow: inset 0 2px 5px rgba(0,0,0,0.05);
+}
+
+.cd-item .num {
+    font-size: 2rem;
+    font-family: 'Fredoka', sans-serif;
+    line-height: 1;
+}
+
+.cd-item .label {
+    font-size: 0.8rem;
+    text-transform: uppercase;
+    font-family: 'Nunito', sans-serif;
+    font-weight: 800;
+    opacity: 1;
+    margin-top: 4px;
+    color: var(--text-dark-red);
+}
+
+.hidden {
+    display: none !important;
+}
+
+.empty-state {
+    color: var(--text-dark-red);
+    text-align: center;
+    padding: 30px 20px;
+    font-size: 1.1rem;
+    font-weight: 700;
+    opacity: 0.7;
+}
