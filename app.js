@@ -150,7 +150,7 @@ document.addEventListener('DOMContentLoaded', () => {
         
         professors.forEach(prof => {
             const btn = document.createElement('button');
-            btn.className = 'chip';
+            btn.className = 'chip fade-in';
             btn.textContent = prof;
             btn.addEventListener('click', () => {
                 profList.querySelectorAll('.chip').forEach(c => c.classList.remove('active'));
@@ -171,7 +171,7 @@ document.addEventListener('DOMContentLoaded', () => {
             const isSaved = savedExams.some(e => e.id === exam.id || (e.examName === exam.examName && e.dateStr === exam.dateStr));
             
             const card = document.createElement('div');
-            card.className = 'result-card';
+            card.className = 'result-card fade-in';
             card.innerHTML = `
                 <h3>Appello: ${exam.dateStr}</h3>
                 <div class="info-grid">
@@ -421,7 +421,7 @@ document.addEventListener('DOMContentLoaded', () => {
         }
 
         if (savedExams.length === 0) {
-            savedExamsList.innerHTML = '<p class="empty-state">Nessun esame salvato.</p>';
+            savedExamsList.innerHTML = '<div class="empty-state fade-in"><span>📭</span> Nessun esame salvato.<br><span style="font-size: 1rem; margin-top:5px;">Cerca una materia per aggiungerla al tuo calendario!</span></div>';
             return;
         }
 
@@ -444,7 +444,7 @@ document.addEventListener('DOMContentLoaded', () => {
             }
 
             const card = document.createElement('div');
-            card.className = 'saved-exam-card';
+            card.className = 'saved-exam-card fade-in';
             card.innerHTML = `
                 <h3>${exam.examName}</h3>
                 <div class="info-grid">
