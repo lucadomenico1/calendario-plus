@@ -1,0 +1,23 @@
+{
+  "name": "calendarioplus",
+  "version": "1.0.0",
+  "main": "app.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/lucadomenico1/calendario-plus.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/lucadomenico1/calendario-plus/issues"
+  },
+  "homepage": "https://github.com/lucadomenico1/calendario-plus#readme",
+  "description": "",
+  "dependencies": {
+    "pdfjs-dist": "^3.11.174"
+  }
+}
