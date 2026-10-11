@@ -150,17 +150,6 @@ document.addEventListener('DOMContentLoaded', () => {
         return `<span class="year-badge ${cls}">${yearLevel}</span>`;
     }
 
-    // --- FILTRI ANNO DI CORSO ---
-    const yearChips = document.querySelectorAll('.year-chip');
-    yearChips.forEach(chip => {
-        chip.addEventListener('click', () => {
-            yearChips.forEach(c => c.classList.remove('active'));
-            chip.classList.add('active');
-            selectedYearFilter = chip.getAttribute('data-year');
-            triggerSearch();
-        });
-    });
-
     // Close autocomplete when clicking outside
     document.addEventListener("click", function (e) {
         if (e.target !== subjectInput && e.target !== autocompleteList) {
@@ -175,21 +164,9 @@ document.addEventListener('DOMContentLoaded', () => {
         profContainer.classList.add('hidden');
         appelliContainer.classList.add('hidden');
 
-        let subjects = Object.keys(groupedExams);
-        if (selectedYearFilter !== 'ALL') {
-            subjects = subjects.filter(s => {
-                const years = subjectYearMap[s];
-                return years && years.has(selectedYearFilter);
-            });
-        }
+        if (!val) return;
 
-        if (!val) {
-            if (selectedYearFilter !== 'ALL') {
-                renderAutocompleteSuggestions(subjects.slice(0, 10), "");
-            }
-            return;
-        }
-
+        const subjects = Object.keys(groupedExams);
         const matches = subjects.filter(s => s.toLowerCase().includes(val.toLowerCase()));
         renderAutocompleteSuggestions(matches.slice(0, 10), val);
     }
@@ -200,25 +177,18 @@ document.addEventListener('DOMContentLoaded', () => {
             const emptyDiv = document.createElement('div');
             emptyDiv.style.opacity = '0.7';
             emptyDiv.style.padding = '12px 16px';
-            emptyDiv.textContent = 'Nessuna materia trovata per il filtro selezionato';
+            emptyDiv.textContent = 'Nessuna materia trovata';
             autocompleteList.appendChild(emptyDiv);
             return;
         }
 
         matches.forEach(match => {
             const div = document.createElement('div');
-            let badgeText = '';
-            const years = subjectYearMap[match];
-            if (years && years.size > 0) {
-                const arr = Array.from(years);
-                badgeText = ` <span style="font-size:0.75rem; opacity:0.85; font-weight:800; color:var(--inner-red);">(${arr.join(', ')})</span>`;
-            }
-
             if (query) {
                 const regex = new RegExp(`(${query})`, "gi");
-                div.innerHTML = match.replace(regex, "<strong>$1</strong>") + badgeText;
+                div.innerHTML = match.replace(regex, "<strong>$1</strong>");
             } else {
-                div.innerHTML = match + badgeText;
+                div.innerHTML = match;
             }
             
             div.addEventListener('click', () => {
@@ -231,11 +201,6 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     subjectInput.addEventListener('input', triggerSearch);
-    subjectInput.addEventListener('focus', () => {
-        if (!subjectInput.value && selectedYearFilter !== 'ALL') {
-            triggerSearch();
-        }
-    });
 
     function selectSubject(subject) {
         appelliContainer.classList.add('hidden');
