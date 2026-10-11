@@ -18,6 +18,10 @@ document.addEventListener('DOMContentLoaded', () => {
     
     const savedExamsList = document.getElementById('saved-exams-list');
 
+    // Action buttons
+    const shareExamsBtn = document.getElementById('share-exams-btn');
+    const clearAllExamsBtn = document.getElementById('clear-all-exams-btn');
+
     // Manual form elements
     const showManualFormBtn = document.getElementById('show-manual-form-btn');
     const manualExamForm = document.getElementById('manual-exam-form');
@@ -26,6 +30,8 @@ document.addEventListener('DOMContentLoaded', () => {
 
     let allExams = []; 
     let groupedExams = {}; 
+    let subjectYearMap = {}; // { "MATERIA": Set(["1° Anno", ...]) }
+    let selectedYearFilter = 'ALL';
     let savedExams = JSON.parse(localStorage.getItem('calendarioPlusExams')) || [];
 
     // Initialize
@@ -117,6 +123,7 @@ document.addEventListener('DOMContentLoaded', () => {
             ora: timeVal,
             aula: roomVal,
             appelloDetails: 'Prova Intercorso aggiunta manualmente',
+            yearLevel: 'Intercorso',
             timestamp: parsedDate.getTime(),
             isManual: true
         };
@@ -132,6 +139,28 @@ document.addEventListener('DOMContentLoaded', () => {
         document.getElementById('manual-room').value = '';
     });
 
+    // Helper per Badge Anno
+    function getBadgeHtml(yearLevel) {
+        if (!yearLevel || yearLevel === 'Altro') return '';
+        let cls = 'badge-anno-altro';
+        if (yearLevel === '1° Anno') cls = 'badge-anno-1';
+        else if (yearLevel === '2° Anno') cls = 'badge-anno-2';
+        else if (yearLevel === '3° Anno') cls = 'badge-anno-3';
+        else if (yearLevel === 'Magistrale') cls = 'badge-anno-mag';
+        return `<span class="year-badge ${cls}">${yearLevel}</span>`;
+    }
+
+    // --- FILTRI ANNO DI CORSO ---
+    const yearChips = document.querySelectorAll('.year-chip');
+    yearChips.forEach(chip => {
+        chip.addEventListener('click', () => {
+            yearChips.forEach(c => c.classList.remove('active'));
+            chip.classList.add('active');
+            selectedYearFilter = chip.getAttribute('data-year');
+            triggerSearch();
+        });
+    });
+
     // Close autocomplete when clicking outside
     document.addEventListener("click", function (e) {
         if (e.target !== subjectInput && e.target !== autocompleteList) {
@@ -139,23 +168,58 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     });
 
-    // --- NEW SEARCH LOGIC ---
-    subjectInput.addEventListener('input', function() {
-        const val = this.value;
+    // --- SEARCH & AUTOCOMPLETE ---
+    function triggerSearch() {
+        const val = subjectInput.value.trim();
         autocompleteList.innerHTML = '';
         profContainer.classList.add('hidden');
         appelliContainer.classList.add('hidden');
-        
-        if (!val) return;
-        
-        const subjects = Object.keys(groupedExams);
+
+        let subjects = Object.keys(groupedExams);
+        if (selectedYearFilter !== 'ALL') {
+            subjects = subjects.filter(s => {
+                const years = subjectYearMap[s];
+                return years && years.has(selectedYearFilter);
+            });
+        }
+
+        if (!val) {
+            if (selectedYearFilter !== 'ALL') {
+                renderAutocompleteSuggestions(subjects.slice(0, 10), "");
+            }
+            return;
+        }
+
         const matches = subjects.filter(s => s.toLowerCase().includes(val.toLowerCase()));
-        
-        matches.slice(0, 10).forEach(match => { // Show max 10 suggestions
+        renderAutocompleteSuggestions(matches.slice(0, 10), val);
+    }
+
+    function renderAutocompleteSuggestions(matches, query) {
+        autocompleteList.innerHTML = '';
+        if (matches.length === 0 && query) {
+            const emptyDiv = document.createElement('div');
+            emptyDiv.style.opacity = '0.7';
+            emptyDiv.style.padding = '12px 16px';
+            emptyDiv.textContent = 'Nessuna materia trovata per il filtro selezionato';
+            autocompleteList.appendChild(emptyDiv);
+            return;
+        }
+
+        matches.forEach(match => {
             const div = document.createElement('div');
-            // Highlight the matching part
-            const regex = new RegExp(`(${val})`, "gi");
-            div.innerHTML = match.replace(regex, "<strong>$1</strong>");
+            let badgeText = '';
+            const years = subjectYearMap[match];
+            if (years && years.size > 0) {
+                const arr = Array.from(years);
+                badgeText = ` <span style="font-size:0.75rem; opacity:0.85; font-weight:800; color:var(--inner-red);">(${arr.join(', ')})</span>`;
+            }
+
+            if (query) {
+                const regex = new RegExp(`(${query})`, "gi");
+                div.innerHTML = match.replace(regex, "<strong>$1</strong>") + badgeText;
+            } else {
+                div.innerHTML = match + badgeText;
+            }
             
             div.addEventListener('click', () => {
                 subjectInput.value = match;
@@ -164,6 +228,13 @@ document.addEventListener('DOMContentLoaded', () => {
             });
             autocompleteList.appendChild(div);
         });
+    }
+
+    subjectInput.addEventListener('input', triggerSearch);
+    subjectInput.addEventListener('focus', () => {
+        if (!subjectInput.value && selectedYearFilter !== 'ALL') {
+            triggerSearch();
+        }
     });
 
     function selectSubject(subject) {
@@ -193,10 +264,12 @@ document.addEventListener('DOMContentLoaded', () => {
         
         exams.forEach(exam => {
             const isSaved = savedExams.some(e => e.id === exam.id || (e.examName === exam.examName && e.dateStr === exam.dateStr));
+            const badgeHtml = getBadgeHtml(exam.yearLevel);
             
             const card = document.createElement('div');
             card.className = 'result-card fade-in';
             card.innerHTML = `
+                ${badgeHtml}
                 <h3>Appello: ${exam.dateStr}</h3>
                 <div class="info-grid">
                     <p><strong>Ora:</strong> ${exam.ora}</p>
@@ -378,6 +451,19 @@ document.addEventListener('DOMContentLoaded', () => {
             const [day, month, year] = dateStr.split('-');
             const parsedDate = new Date(`${year}-${month}-${day}T00:00:00`);
 
+            // Deduce year level from part / currentExamInfo
+            let yearLevel = "Altro";
+            const contextText = (currentExamInfo + " " + part).toUpperCase();
+            if (contextText.includes("MAGISTRALE")) {
+                yearLevel = "Magistrale";
+            } else if (contextText.includes("1 ANNO") || contextText.includes("PRIMO ANNO") || contextText.includes("1° ANNO")) {
+                yearLevel = "1° Anno";
+            } else if (contextText.includes("2 ANNO") || contextText.includes("SECONDO ANNO") || contextText.includes("2° ANNO")) {
+                yearLevel = "2° Anno";
+            } else if (contextText.includes("3 ANNO") || contextText.includes("TERZO ANNO") || contextText.includes("3° ANNO")) {
+                yearLevel = "3° Anno";
+            }
+
             exams.push({
                 id: Math.random().toString(36).substr(2, 9),
                 examName: examName,
@@ -385,6 +471,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 dateStr: dateStr,
                 ora: oraEsame,
                 aula: aulaEsame,
+                yearLevel: yearLevel,
                 timestamp: parsedDate.getTime()
             });
 
@@ -397,6 +484,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
     function buildGroupedExams() {
         groupedExams = {};
+        subjectYearMap = {};
         allExams.forEach(exam => {
             const subject = exam.examName;
             const prof = exam.profName;
@@ -408,6 +496,13 @@ document.addEventListener('DOMContentLoaded', () => {
                 groupedExams[subject][prof] = [];
             }
             groupedExams[subject][prof].push(exam);
+
+            if (!subjectYearMap[subject]) {
+                subjectYearMap[subject] = new Set();
+            }
+            if (exam.yearLevel) {
+                subjectYearMap[subject].add(exam.yearLevel);
+            }
         });
     }
 
@@ -469,7 +564,10 @@ document.addEventListener('DOMContentLoaded', () => {
 
             const card = document.createElement('div');
             card.className = 'saved-exam-card fade-in';
+            const badgeHtml = getBadgeHtml(exam.yearLevel);
+            
             card.innerHTML = `
+                ${badgeHtml}
                 <h3>${exam.examName}</h3>
                 <div class="info-grid">
                     <p><strong>Prof:</strong> ${exam.profName}</p>
@@ -483,6 +581,71 @@ document.addEventListener('DOMContentLoaded', () => {
 
             card.querySelector('button').addEventListener('click', () => removeExam(exam.id));
             savedExamsList.appendChild(card);
+        });
+    }
+
+    // --- CONDIVIDI CON AMICI ---
+    if (shareExamsBtn) {
+        shareExamsBtn.addEventListener('click', async () => {
+            if (savedExams.length === 0) {
+                alert("Non hai ancora salvato nessun esame da condividere! Cerca una materia e salva almeno un appello.");
+                return;
+            }
+
+            let shareText = "📚 I MIEI PROSSIMI ESAMI (CalendarioPLUS):\n\n";
+            savedExams.forEach((exam, idx) => {
+                const yr = exam.yearLevel && exam.yearLevel !== 'Altro' ? ` [${exam.yearLevel}]` : '';
+                shareText += `${idx + 1}. 📖 ${exam.examName}${yr}\n`;
+                shareText += `   📅 Data: ${exam.dateStr}`;
+                if (exam.ora && exam.ora !== 'N/D') shareText += ` ore ${exam.ora}`;
+                shareText += `\n   👨‍🏫 Prof: ${exam.profName}\n`;
+                if (exam.aula && exam.aula !== 'Non specificata' && exam.aula !== 'N/D') {
+                    shareText += `   📍 Aula: ${exam.aula}\n`;
+                }
+                shareText += `\n`;
+            });
+            shareText += "Organizzato con CalendarioPLUS ✨";
+
+            if (navigator.share) {
+                try {
+                    await navigator.share({
+                        title: 'I miei esami - CalendarioPLUS',
+                        text: shareText
+                    });
+                    return;
+                } catch (err) {
+                    // Finestra chiusa dall'utente o fallback
+                }
+            }
+
+            // Fallback: Copia negli appunti
+            navigator.clipboard.writeText(shareText).then(() => {
+                alert("📋 Elenco esami copiato negli appunti! Ora puoi incollarlo su WhatsApp, Telegram o nei tuoi gruppi di studio.");
+            }).catch(() => {
+                window.open(`https://api.whatsapp.com/send?text=${encodeURIComponent(shareText)}`, '_blank');
+            });
+        });
+    }
+
+    // --- SVUOTA TUTTO ---
+    if (clearAllExamsBtn) {
+        clearAllExamsBtn.addEventListener('click', () => {
+            if (savedExams.length === 0) {
+                alert("Nessun esame salvato da rimuovere.");
+                return;
+            }
+
+            const confirmClear = confirm("⚠️ Sei sicuro di voler cancellare TUTTI gli esami salvati dal tuo calendario?");
+            if (confirmClear) {
+                savedExams = [];
+                localStorage.setItem('calendarioPlusExams', JSON.stringify(savedExams));
+                renderSavedExams();
+
+                const activeChip = profList.querySelector('.chip.active');
+                if (activeChip && subjectInput.value) {
+                    selectProfessor(subjectInput.value, activeChip.textContent);
+                }
+            }
         });
     }
 });

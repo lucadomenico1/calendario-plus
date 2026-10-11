@@ -452,3 +452,84 @@ h2 {
     color: var(--card-pink);
     font-weight: 900;
 }
+
+/* --- HEADER & ACTIONS DEI TUOI ESAMI --- */
+.saved-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 20px;
+    flex-wrap: wrap;
+    gap: 10px;
+}
+
+.saved-actions {
+    display: flex;
+    gap: 8px;
+    align-items: center;
+}
+
+.btn-action {
+    width: auto !important;
+    padding: 8px 14px !important;
+    font-size: 0.85rem !important;
+    margin: 0 !important;
+    border-radius: 12px !important;
+    box-shadow: none !important;
+    font-weight: 800 !important;
+}
+
+.btn-clear {
+    background-color: rgba(239, 61, 50, 0.15) !important;
+    color: var(--inner-red) !important;
+    padding: 8px 12px !important;
+    font-size: 1rem !important;
+}
+
+.btn-clear:hover {
+    background-color: var(--inner-red) !important;
+    color: var(--white) !important;
+}
+
+/* --- BADGE ANNO DI CORSO --- */
+.year-badge {
+    display: inline-block;
+    padding: 4px 12px;
+    border-radius: 20px;
+    font-size: 0.75rem;
+    font-weight: 800;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    margin-bottom: 10px;
+    box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+}
+
+.badge-anno-1 {
+    background: #e0f2fe;
+    color: #0369a1;
+}
+
+.badge-anno-2 {
+    background: #fef3c7;
+    color: #b45309;
+}
+
+.badge-anno-3 {
+    background: #dcfce7;
+    color: #15803d;
+}
+
+.badge-anno-mag {
+    background: #f3e8ff;
+    color: #7e22ce;
+}
+
+.badge-anno-altro {
+    background: #ffdedb;
+    color: #cc1c12;
+}
+
+.year-chip {
+    font-size: 0.85rem !important;
+    padding: 6px 14px !important;
+}

@@ -10,10 +10,13 @@ Una **Progressive Web App (PWA)** moderna, reattiva e completamente client-side 
 ## 🌟 Caratteristiche Principali
 
 - 🔍 **Ricerca Istantanea con Autocomplete**: Cerca qualsiasi materia in tempo reale.
+- 🏷️ **Badge Anno di Corso & Filtro Rapido**: Filtra per 1° Anno, 2° Anno, 3° Anno o Magistrale con tag visivi dedicati.
 - 👨‍🏫 **Selezione Docente**: Mostra tutti i professori associati a una determinata cattedra con un comodo sistema a chip interattivi.
 - ⏳ **Countdown Intelligente**: Ogni esame salvato mostra i giorni e le ore rimanenti al giorno della prova.
 - 📅 **Ordinamento Cronologico**: Gli esami salvati vengono ordinati automaticamente mostrando per primo quello temporalmente più vicino.
 - ✍️ **Inserimento Prove Intercorso**: Possibilità di aggiungere manualmente qualsiasi prova o parziale non presente nel calendario ufficiale.
+- 📤 **Condivisione Esami (WhatsApp/Telegram)**: Invia la lista formattata dei tuoi prossimi esami ai colleghi di studio in 1 click.
+- 🗑️ **Svuota Tutto con Conferma**: Cancella in sicurezza tutti i promemoria salvati a fine sessione.
 - 📱 **Installabile come App (PWA)**: Supporto per installazione desktop (Windows/Mac) e mobile (Android/iOS) con icona dedicata.
 - 📶 **Supporto Offline**: Grazie al Service Worker integrato, l'app e i calendari possono essere consultati anche in assenza di connessione internet.
 - 🔒 **Privacy Totale**: Nessun dato personale o esame salvato lascia il dispositivo dell'utente (`localStorage`).

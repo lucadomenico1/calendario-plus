@@ -38,10 +38,22 @@
         <div class="dashboard">
             <!-- Search Section -->
             <section id="search-section" class="card hidden">
-                <div style="display: flex; justify-content: center; align-items: center; margin-bottom: 20px;">
+                <div style="display: flex; justify-content: center; align-items: center; margin-bottom: 16px;">
                     <h2 style="margin: 0;">Cerca e Seleziona</h2>
                 </div>
                 
+                <!-- Filtro Anno di Corso -->
+                <div class="form-group" style="margin-bottom: 15px;">
+                    <label style="font-size: 0.9rem; margin-bottom: 6px;">Filtro per anno di corso:</label>
+                    <div id="year-filter-chips" class="chips-container">
+                        <button class="chip year-chip active" data-year="ALL">Tutti</button>
+                        <button class="chip year-chip" data-year="1° Anno">1° Anno</button>
+                        <button class="chip year-chip" data-year="2° Anno">2° Anno</button>
+                        <button class="chip year-chip" data-year="3° Anno">3° Anno</button>
+                        <button class="chip year-chip" data-year="Magistrale">Magistrale</button>
+                    </div>
+                </div>
+
                 <div class="form-group">
                     <label>1. Cerca la materia</label>
                     <div class="autocomplete">
@@ -63,9 +75,13 @@
 
             <!-- Saved Exams Section -->
             <section id="saved-exams-section" class="card">
-                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
+                <div class="saved-header">
                     <h2 style="margin: 0;">I Tuoi Esami</h2>
-                    <button id="show-manual-form-btn" class="btn" style="width: auto; padding: 8px 14px; font-size: 0.85rem; margin: 0; box-shadow: none;">+ Intercorso</button>
+                    <div class="saved-actions">
+                        <button id="share-exams-btn" class="btn btn-action" title="Condividi i tuoi esami">📤 Condividi</button>
+                        <button id="show-manual-form-btn" class="btn btn-action">+ Intercorso</button>
+                        <button id="clear-all-exams-btn" class="btn btn-action btn-clear" title="Svuota tutti gli esami">🗑️</button>
+                    </div>
                 </div>
 
                 <!-- Manual Form -->
