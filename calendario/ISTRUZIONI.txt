@@ -1,0 +1,14 @@
+=== ISTRUZIONI PER AGGIORNARE IL CALENDARIO ESAMI ===
+
+Per cambiare il calendario per la nuova sessione:
+1. Elimina il file "calendario.pdf" presente in questa cartella (o sostituiscilo).
+2. Inserisci il nuovo file PDF qui dentro.
+3. Rinomina il nuovo file esattamente in:
+   calendario.pdf
+
+L'app riconoscerà automaticamente anche se chiami il file:
+- calendario.pdf (consigliato)
+- ttPdf.pdf
+- esami.pdf
+
+Una volta sostituito il file, fai il commit e il push su GitHub (o chiedi all'assistente) e il nuovo calendario sarà subito attivo per tutti gli utenti!

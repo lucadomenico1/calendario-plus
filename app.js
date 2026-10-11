@@ -36,8 +36,32 @@ document.addEventListener('DOMContentLoaded', () => {
     async function loadDatabase() {
         try {
             uploadStatus.textContent = 'Scaricamento e lettura del database in corso...';
-            const response = await fetch('./ttPdf.pdf');
-            if (!response.ok) throw new Error("PDF non trovato sul server.");
+            
+            // Possibili percorsi del file (permette la massima comodità di aggiornamento)
+            const candidatePaths = [
+                './calendario/calendario.pdf',
+                './calendario/ttPdf.pdf',
+                './calendario/esami.pdf',
+                './ttPdf.pdf'
+            ];
+
+            let response = null;
+            for (const path of candidatePaths) {
+                try {
+                    const res = await fetch(path, { cache: 'no-cache' });
+                    if (res.ok) {
+                        response = res;
+                        break;
+                    }
+                } catch (e) {
+                    // Prova percorso successivo
+                }
+            }
+
+            if (!response) {
+                throw new Error("File PDF del calendario non trovato nella cartella 'calendario'.");
+            }
+
             const arrayBuffer = await response.arrayBuffer();
             
             const text = await extractTextFromPDF(arrayBuffer);
@@ -51,7 +75,7 @@ document.addEventListener('DOMContentLoaded', () => {
             }, 800);
         } catch (error) {
             console.error(error);
-            uploadStatus.textContent = 'Errore durante l\'inizializzazione del database. Ricarica la pagina.';
+            uploadStatus.textContent = 'Errore: file PDF non trovato nella cartella "calendario". Inserisci "calendario.pdf" e ricarica la pagina.';
         }
     }
 
