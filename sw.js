@@ -1,4 +1,4 @@
-const CACHE_NAME = 'calendario-plus-v2';
+const CACHE_NAME = 'calendario-plus-v3';
 const ASSETS = [
     './',
     './index.html',
@@ -13,31 +13,10 @@ const ASSETS = [
 ];
 
 self.addEventListener('install', (e) => {
+    self.skipWaiting();
     e.waitUntil(
         caches.open(CACHE_NAME).then((cache) => {
             return cache.addAll(ASSETS);
-        })
-    );
-});
-
-self.addEventListener('fetch', (e) => {
-    // Network-First strategy for PDFs so new exam sessions are immediately reflected
-    if (e.request.url.endsWith('.pdf')) {
-        e.respondWith(
-            fetch(e.request)
-                .then((response) => {
-                    const clonedResponse = response.clone();
-                    caches.open(CACHE_NAME).then((cache) => cache.put(e.request, clonedResponse));
-                    return response;
-                })
-                .catch(() => caches.match(e.request))
-        );
-        return;
-    }
-
-    e.respondWith(
-        caches.match(e.request).then((response) => {
-            return response || fetch(e.request);
         })
     );
 });
@@ -50,6 +29,19 @@ self.addEventListener('activate', (e) => {
                     return caches.delete(key);
                 }
             }));
-        })
+        }).then(() => self.clients.claim())
+    );
+});
+
+// Strategia Network-First: carica sempre l'ultima versione online, usa la cache solo offline
+self.addEventListener('fetch', (e) => {
+    e.respondWith(
+        fetch(e.request)
+            .then((response) => {
+                const clonedResponse = response.clone();
+                caches.open(CACHE_NAME).then((cache) => cache.put(e.request, clonedResponse));
+                return response;
+            })
+            .catch(() => caches.match(e.request))
     );
 });

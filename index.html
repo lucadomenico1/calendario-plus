@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>Calendario Esami PLUS</title>
-    <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" href="style.css?v=3">
     <link rel="manifest" href="manifest.json">
     <meta name="theme-color" content="#cc1c12">
     <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js"></script>
@@ -112,15 +112,25 @@
         </footer>
     </main>
 
-    <script src="app.js"></script>
+    <script src="app.js?v=3"></script>
     <script>
         if ('serviceWorker' in navigator) {
             window.addEventListener('load', () => {
-                navigator.serviceWorker.register('./sw.js').then((reg) => {
-                    console.log('ServiceWorker registrato con successo.', reg.scope);
+                navigator.serviceWorker.register('./sw.js?v=3').then((reg) => {
+                    reg.update();
+                    console.log('ServiceWorker registrato e aggiornato.', reg.scope);
                 }).catch((err) => {
                     console.error('Errore ServiceWorker:', err);
                 });
+            });
+
+            // Se il service worker si aggiorna, ricarica automaticamente una volta sola per mostrare la nuova versione
+            let refreshing = false;
+            navigator.serviceWorker.addEventListener('controllerchange', () => {
+                if (!refreshing) {
+                    refreshing = true;
+                    window.location.reload();
+                }
             });
         }
     </script>
