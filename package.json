@@ -9,14 +9,19 @@
     "type": "git",
     "url": "git+https://github.com/lucadomenico1/calendario-plus.git"
   },
-  "keywords": [],
-  "author": "",
+  "keywords": [
+    "calendario",
+    "esami",
+    "unisa",
+    "pwa"
+  ],
+  "author": "Luco_dC",
   "license": "ISC",
   "bugs": {
     "url": "https://github.com/lucadomenico1/calendario-plus/issues"
   },
   "homepage": "https://github.com/lucadomenico1/calendario-plus#readme",
-  "description": "",
+  "description": "Calendario Esami PLUS - WebApp PWA creata per consultare, cercare e salvare gli appelli d'esame universitari.",
   "dependencies": {
     "pdfjs-dist": "^3.11.174"
   }

@@ -433,5 +433,22 @@ h2 {
 .fade-in { animation: fadeIn 0.4s ease forwards; }
 @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
 
-.empty-state { text-align: center; color: rgba(204, 28, 18, 0.6); padding: 30px 10px; font-weight: 600; font-size: 1.1rem; }
+.empty-state { text-align: center; color: rgba(204, 28, 18, 0.7); padding: 30px 10px; font-weight: 700; font-size: 1.1rem; }
 .empty-state span { display: block; font-size: 2.5rem; margin-bottom: 10px; }
+
+/* --- FOOTER / FIRMA --- */
+.app-footer {
+    text-align: center;
+    margin-top: 30px;
+    margin-bottom: 25px;
+    color: var(--white);
+    opacity: 0.9;
+    font-size: 1rem;
+    font-weight: 700;
+    letter-spacing: 0.4px;
+}
+
+.app-footer strong {
+    color: var(--card-pink);
+    font-weight: 900;
+}

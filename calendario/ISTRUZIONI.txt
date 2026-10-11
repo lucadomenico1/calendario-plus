@@ -1,14 +1,144 @@
-=== ISTRUZIONI PER AGGIORNARE IL CALENDARIO ESAMI ===
+================================================================================
+                    CALENDARIO ESAMI PLUS - MANUALE TECNICO & ISTRUZIONI
+================================================================================
+Autore & Ideatore: Luco_dC
+Progetto: Calendario Esami PLUS (CoScienze)
+Tipo: WebApp / PWA (Progressive Web Application) Client-Side
+Linguaggi: HTML5, CSS3, JavaScript (Vanilla ES6+), PDF.js
 
-Per cambiare il calendario per la nuova sessione:
-1. Elimina il file "calendario.pdf" presente in questa cartella (o sostituiscilo).
-2. Inserisci il nuovo file PDF qui dentro.
-3. Rinomina il nuovo file esattamente in:
-   calendario.pdf
 
-L'app riconoscerà automaticamente anche se chiami il file:
-- calendario.pdf (consigliato)
-- ttPdf.pdf
-- esami.pdf
+--------------------------------------------------------------------------------
+1. GUIDA RAPIDA: COME AGGIORNARE IL CALENDARIO PER UNA NUOVA SESSIONE
+--------------------------------------------------------------------------------
+Quando esce il calendario della nuova sessione esami, procedere come segue:
 
-Una volta sostituito il file, fai il commit e il push su GitHub (o chiedi all'assistente) e il nuovo calendario sarà subito attivo per tutti gli utenti!
+1. Aprire questa cartella ("calendario/").
+2. Eliminare il vecchio file "calendario.pdf" (oppure sovrascriverlo).
+3. Inserire il nuovo file PDF rilasciato dall'università.
+4. Assicurarsi che il file si chiami esattamente:
+   -> calendario.pdf
+   (L'applicazione supporta automaticamente come fallback anche i nomi 
+    "esami.pdf" o "ttPdf.pdf").
+5. Fare il commit e il push su GitHub (tramite Git o tramite l'interfaccia web):
+   git add .
+   git commit -m "Aggiornamento calendario nuova sessione"
+   git push origin main
+
+Grazie al Service Worker con strategia "Network-First", tutti gli utenti che 
+visiteranno il sito o apriranno l'app installata scaricheranno istantaneamente il 
+nuovo file aggiornato senza conflitti di cache.
+
+
+--------------------------------------------------------------------------------
+2. ARCHITETTURA DELL'APPLICAZIONE
+--------------------------------------------------------------------------------
+L'applicazione è progettata come una SPA (Single Page Application) completamente 
+CLIENT-SIDE:
+- Non necessita di server backend, né di database SQL/NoSQL esterno.
+- Può essere ospitata gratuitamente su GitHub Pages, Vercel, Netlify o qualsiasi 
+  web server statico.
+- Tutti i calcoli, il parsing del PDF e la gestione dello stato avvengono nel 
+  browser del dispositivo dell'utente.
+- Privacy totale: gli esami salvati dal singolo studente rimangono memorizzati nel 
+  suo browser (localStorage) e non vengono mai inviati all'esterno.
+
+
+--------------------------------------------------------------------------------
+3. STRUTTURA DEI FILE DI PROGETTO
+--------------------------------------------------------------------------------
+CalendarioPLUS/
+├── calendario/
+│   ├── calendario.pdf       <-- Il file PDF contenente tutti gli appelli d'esame
+│   └── ISTRUZIONI.txt       <-- Questo manuale tecnico per sviluppatori
+├── index.html               <-- Struttura semantica, viewport PWA, import CDN
+├── style.css                <-- Tema grafico CoScienze (palette rossa/pesca, card)
+├── app.js                   <-- Motore logico (parsing PDF, filtri, localStorage)
+├── sw.js                    <-- Service Worker per supporto offline e caching PWA
+├── manifest.json            <-- Configurazione PWA (titolo, colori, icone, avvio)
+├── logo.png                 <-- Logo dell'applicazione (utilizzato anche come icona)
+├── package.json             <-- Metadati del progetto (Autore: Luco_dC)
+└── README.md                <-- Documentazione della repository GitHub
+
+
+--------------------------------------------------------------------------------
+4. COME FUNZIONA IL MOTORE DI PARSING (app.js)
+--------------------------------------------------------------------------------
+La funzione centrale è 'loadDatabase()' che richiama la libreria 'pdf.js' (caricata 
+tramite CDN di Cloudflare).
+
+Flusso di elaborazione:
+1. LETTURA DEL FILE:
+   L'app effettua una 'fetch("./calendario/calendario.pdf", { cache: "no-cache" })'.
+   Il file viene convertito in un ArrayBuffer e passato all'interprete di PDF.js.
+
+2. ESTRAZIONE E ORDINAMENTO SPAZIALE:
+   Ogni pagina PDF contiene blocchi di testo sparsi. La funzione 'extractTextFromPDF' 
+   ordina i frammenti in base alle loro coordinate fisiche (Y decrescente per le righe, 
+   X crescente per le colonne) per ricostruire la tabella nel giusto ordine di lettura.
+
+3. RICONOSCIMENTO ESAMI & ANCORAGGI:
+   La funzione 'parseTextToExams' segmenta il testo usando come ancora di taglio 
+   le espressioni: "I appello:", "II appello:", "III appello:", ecc.
+   Per ogni blocco:
+   - Data: Individuata tramite regex (\d{2}-\d{2}-\d{4}).
+   - Ora: Individuata tramite regex (\d{2}:\d{2}).
+   - Materia e Professore: Vengono ricavati risalendo all'indietro a partire 
+     dall'anno accademico (es. 2025/2026). Poiché le materie sono scritte in 
+     MAIUSCOLO e i nomi dei professori hanno lettere minuscole (es. Rossi Mario), 
+     l'algoritmo individua il punto esatto di separazione.
+   - Nomi su più righe: Alcune materie lunghe (es. "ARCHITETTURA DEGLI ELABORATORI") 
+     vengono spezzate su due righe nel PDF originale. È presente un dizionario 
+     di ricongiunzione automatica per ripristinare il titolo completo.
+
+4. RAGGRUPPAMENTO DEI DATI:
+   Gli appelli estratti vengono organizzati nella struttura gerarchica:
+   groupedExams = {
+       "NOME MATERIA": {
+           "NOME PROFESSORE": [ appello1, appello2, ... ]
+       }
+   };
+
+
+--------------------------------------------------------------------------------
+5. FLUSSO UTENTE (SEARCH & WATCHLIST)
+--------------------------------------------------------------------------------
+1. Barra di Ricerca: Autocomplete in tempo reale sul nome della materia.
+2. Selezione Docente: Selezionata la materia, compaiono i chip coi docenti.
+3. Elenco Appelli: Cliccando sul docente appaiono le card con data, ora, aula e 
+   il bottone per salvare l'esame.
+4. Watchlist ("I Tuoi Esami"):
+   - Gli esami salvati vengono salvati nel 'localStorage' del browser.
+   - Ogni minuto viene aggiornato un countdown visuale (Giorni e Ore rimanenti).
+   - Gli esami sono ordinati cronologicamente (il più vicino temporalmente compare in cima).
+   - Gli esami scaduti da oltre 24 ore vengono rimossi automaticamente dalla lista.
+5. Inserimento Manuale ("+ Intercorso"):
+   - Permette allo studente di inserire esami o prove intercorso non presenti nel PDF.
+   - L'esame manuale viene salvato con un ID univoco e si integra perfettamente 
+     con il medesimo sistema di countdown.
+
+
+--------------------------------------------------------------------------------
+6. PROGRESSIVE WEB APP & OFFLINE (PWA)
+--------------------------------------------------------------------------------
+- 'manifest.json' permette all'utente di cliccare "Aggiungi a schermata Home" su 
+  Android/iOS o "Installa" da Chrome/Edge su Windows/Mac per creare una vera app.
+- 'sw.js' registra un Service Worker che:
+  - Mette in cache tutte le risorse statiche (HTML, CSS, JS, font, icone).
+  - Gestisce il file PDF con politica "Network-First": se c'è connessione internet, 
+    scarica l'ultima versione dal server/repo; se non c'è connessione, usa la copia 
+    salvata in cache permettendo all'app di funzionare anche totalmente OFFLINE.
+
+
+--------------------------------------------------------------------------------
+7. NOTE PER FUTURE MODIFICHE
+--------------------------------------------------------------------------------
+- Cambiare i colori: Tutte le variabili cromatiche principali sono dichiarate 
+  all'inizio di 'style.css' (es. --bg-red, --card-pink, --inner-red).
+- Modificare i font: Il progetto usa Google Fonts ('Fredoka' per i titoli e 
+  'Nunito' per il testo), importati nell'header di 'index.html'.
+- Nuovi formati di date/ore: Nel caso l'ateneo cambi il layout del PDF, intervenire 
+  sulla funzione 'parseTextToExams' in 'app.js'.
+
+================================================================================
+Firmato e sviluppato da: Luco_dC
+================================================================================
