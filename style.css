@@ -176,11 +176,13 @@ h2 {
     display: grid;
     grid-template-columns: 1fr;
     gap: 24px;
+    align-items: start;
 }
 
 @media (min-width: 800px) {
     .dashboard {
         grid-template-columns: 1fr 1fr;
+        align-items: start;
     }
 }
 
@@ -295,7 +297,7 @@ h2 {
     display: flex;
     flex-direction: column;
     gap: 16px;
-    max-height: 600px;
+    max-height: 80vh;
     overflow-y: auto;
     padding-right: 6px;
     padding-bottom: 10px;
@@ -319,13 +321,15 @@ h2 {
 .result-card, .saved-exam-card {
     border: 1px solid rgba(255, 255, 255, 0.28);
     border-radius: 22px;
-    padding: 24px;
+    padding: 22px 20px;
     background: linear-gradient(135deg, #f04035 0%, #db2418 100%);
     color: var(--white);
     box-shadow: 0 8px 24px rgba(186, 18, 10, 0.26);
     transition: transform 0.25s cubic-bezier(0.34, 1.56, 0.64, 1), box-shadow 0.25s ease;
     position: relative;
     overflow: hidden;
+    flex-shrink: 0 !important;
+    min-height: fit-content !important;
 }
 
 .result-card::before, .saved-exam-card::before {
@@ -345,20 +349,21 @@ h2 {
 }
 
 .result-card h3, .saved-exam-card h3 {
-    font-size: 1.3rem;
+    font-size: 1.25rem;
     color: var(--white);
     margin-bottom: 14px;
     text-transform: uppercase;
     letter-spacing: 0.5px;
     border-bottom: 1.5px dashed rgba(255, 255, 255, 0.35);
-    padding-bottom: 12px;
+    padding-bottom: 10px;
+    word-break: break-word;
 }
 
 .info-grid {
-    display: grid;
-    grid-template-columns: 1fr;
-    gap: 10px;
-    margin-bottom: 20px;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    margin-bottom: 18px;
 }
 
 .info-grid p {
@@ -366,15 +371,19 @@ h2 {
     color: var(--white);
     margin: 0;
     font-weight: 700;
+    display: flex;
+    flex-wrap: wrap;
+    align-items: baseline;
+    gap: 8px;
+    line-height: 1.35;
 }
 
 .info-grid strong {
-    color: var(--text-pink);
+    color: #ffe6e3;
     font-weight: 800;
     text-transform: uppercase;
-    font-size: 0.82rem;
-    display: block;
-    margin-bottom: 2px;
+    font-size: 0.85rem;
+    display: inline;
     letter-spacing: 0.4px;
 }
 
@@ -748,13 +757,15 @@ h2 {
     }
 
     .results-container, .saved-container {
-        max-height: 520px;
+        max-height: 65vh;
         gap: 12px;
     }
 
     .result-card, .saved-exam-card {
         padding: 16px;
-        border-radius: 16px;
+        border-radius: 18px;
+        flex-shrink: 0 !important;
+        min-height: fit-content !important;
     }
 
     .result-card h3, .saved-exam-card h3 {
