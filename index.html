@@ -4,10 +4,11 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>Calendario Esami PLUS</title>
-    <link rel="stylesheet" href="style.css?v=5">
+    <link rel="stylesheet" href="style.css?v=6">
     <link rel="manifest" href="manifest.json">
     <meta name="theme-color" content="#cc1c12">
     <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
 </head>
 <body>
@@ -66,6 +67,7 @@
                 <div class="saved-header">
                     <h2 style="margin: 0;">I Tuoi Esami</h2>
                     <div class="saved-actions">
+                        <button id="sync-exams-btn" class="btn btn-action" title="Sincronizza con telefono o altro browser">📲 Sincronizza</button>
                         <button id="share-exams-btn" class="btn btn-action" title="Condividi i tuoi esami">📤 Condividi</button>
                         <button id="show-manual-form-btn" class="btn btn-action">+ Intercorso</button>
                         <button id="clear-all-exams-btn" class="btn btn-action btn-clear" title="Svuota tutti gli esami">🗑️</button>
@@ -94,13 +96,31 @@
             </section>
         </div>
 
+        <!-- Sync Modal -->
+        <div id="sync-modal" class="modal-overlay hidden">
+            <div class="modal-content fade-in">
+                <div class="modal-header">
+                    <h3>Sincronizza Dispositivo 📲</h3>
+                    <button id="close-sync-modal" class="close-btn">&times;</button>
+                </div>
+                <p style="font-size: 0.95rem; opacity: 0.9; margin: 15px 0 10px 0; line-height: 1.4;">
+                    Inquadra questo QR code con la fotocamera del tuo telefono per importare all'istante i tuoi esami su qualsiasi browser:
+                </p>
+                <div id="qrcode-container" class="qrcode-wrapper"></div>
+                <div style="margin-top: 20px; display: flex; flex-direction: column; gap: 10px;">
+                    <button id="copy-sync-link-btn" class="btn" style="background: var(--inner-red); color: white; width: 100%;">📋 Copia Link di Sincronizzazione</button>
+                    <button id="cancel-sync-modal-btn" class="btn btn-danger" style="margin-top: 0; width: 100%;">Chiudi</button>
+                </div>
+            </div>
+        </div>
+
     </main>
 
-    <script src="app.js?v=5"></script>
+    <script src="app.js?v=6"></script>
     <script>
         if ('serviceWorker' in navigator) {
             window.addEventListener('load', () => {
-                navigator.serviceWorker.register('./sw.js?v=5').then((reg) => {
+                navigator.serviceWorker.register('./sw.js?v=6').then((reg) => {
                     reg.update();
                     console.log('ServiceWorker registrato e aggiornato.', reg.scope);
                 }).catch((err) => {

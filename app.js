@@ -19,8 +19,16 @@ document.addEventListener('DOMContentLoaded', () => {
     const savedExamsList = document.getElementById('saved-exams-list');
 
     // Action buttons
+    const syncExamsBtn = document.getElementById('sync-exams-btn');
     const shareExamsBtn = document.getElementById('share-exams-btn');
     const clearAllExamsBtn = document.getElementById('clear-all-exams-btn');
+
+    // Sync Modal elements
+    const syncModal = document.getElementById('sync-modal');
+    const closeSyncModalBtn = document.getElementById('close-sync-modal');
+    const cancelSyncModalBtn = document.getElementById('cancel-sync-modal-btn');
+    const copySyncLinkBtn = document.getElementById('copy-sync-link-btn');
+    const qrcodeContainer = document.getElementById('qrcode-container');
 
     // Manual form elements
     const showManualFormBtn = document.getElementById('show-manual-form-btn');
@@ -37,6 +45,7 @@ document.addEventListener('DOMContentLoaded', () => {
     // Initialize
     renderSavedExams();
     setInterval(renderSavedExams, 60000); 
+    checkIncomingSync(); 
 
     // Auto-load PDF on startup
     async function loadDatabase() {
@@ -611,6 +620,153 @@ document.addEventListener('DOMContentLoaded', () => {
                     selectProfessor(subjectInput.value, activeChip.textContent);
                 }
             }
+    }
+
+    // --- SINCRONIZZAZIONE DISPOSITIVI (QR CODE & LINK) ---
+    let currentSyncUrl = '';
+
+    function encodeSyncData(data) {
+        const compact = data.map(e => ({
+            id: e.id,
+            n: e.examName,
+            p: e.profName,
+            d: e.dateStr,
+            o: e.ora,
+            a: e.aula,
+            y: e.yearLevel || '',
+            t: e.timestamp,
+            m: !!e.isManual
+        }));
+        return btoa(encodeURIComponent(JSON.stringify(compact)));
+    }
+
+    function decodeSyncData(encoded) {
+        const compact = JSON.parse(decodeURIComponent(atob(encoded)));
+        return compact.map(e => ({
+            id: e.id || ('sync_' + Math.random().toString(36).substr(2, 9)),
+            examName: e.n,
+            profName: e.p,
+            dateStr: e.d,
+            ora: e.o,
+            aula: e.a,
+            yearLevel: e.y || 'Altro',
+            timestamp: e.t,
+            isManual: !!e.m
+        }));
+    }
+
+    function openSyncModal() {
+        if (savedExams.length === 0) {
+            alert("Non hai ancora salvato nessun esame da sincronizzare! Salva prima almeno un esame.");
+            return;
+        }
+
+        const encodedData = encodeSyncData(savedExams);
+        currentSyncUrl = `${window.location.origin}${window.location.pathname}#sync=${encodedData}`;
+
+        qrcodeContainer.innerHTML = '';
+        if (typeof QRCode !== 'undefined') {
+            try {
+                new QRCode(qrcodeContainer, {
+                    text: currentSyncUrl,
+                    width: 190,
+                    height: 190,
+                    colorDark: "#cc1c12",
+                    colorLight: "#ffffff",
+                    correctLevel: QRCode.CorrectLevel.M
+                });
+            } catch (err) {
+                renderFallbackQrCode();
+            }
+        } else {
+            renderFallbackQrCode();
+        }
+
+        syncModal.classList.remove('hidden');
+    }
+
+    function renderFallbackQrCode() {
+        qrcodeContainer.innerHTML = '';
+        const img = document.createElement('img');
+        img.src = `https://api.qrserver.com/v1/create-qr-code/?size=200x200&color=cc1c12&data=${encodeURIComponent(currentSyncUrl)}`;
+        img.alt = "QR Code di Sincronizzazione";
+        qrcodeContainer.appendChild(img);
+    }
+
+    function closeSyncModal() {
+        syncModal.classList.add('hidden');
+    }
+
+    if (syncExamsBtn) {
+        syncExamsBtn.addEventListener('click', openSyncModal);
+    }
+
+    if (closeSyncModalBtn) {
+        closeSyncModalBtn.addEventListener('click', closeSyncModal);
+    }
+
+    if (cancelSyncModalBtn) {
+        cancelSyncModalBtn.addEventListener('click', closeSyncModal);
+    }
+
+    if (syncModal) {
+        syncModal.addEventListener('click', (e) => {
+            if (e.target === syncModal) {
+                closeSyncModal();
+            }
         });
+    }
+
+    if (copySyncLinkBtn) {
+        copySyncLinkBtn.addEventListener('click', () => {
+            if (!currentSyncUrl) return;
+            navigator.clipboard.writeText(currentSyncUrl).then(() => {
+                alert("📋 Link di sincronizzazione copiato! Incollalo su WhatsApp o invialo al tuo telefono.");
+            }).catch(() => {
+                prompt("Copia questo link di sincronizzazione per il tuo altro dispositivo:", currentSyncUrl);
+            });
+        });
+    }
+
+    function checkIncomingSync() {
+        const hash = window.location.hash;
+        const search = window.location.search;
+        let syncParam = null;
+
+        if (hash && hash.includes('sync=')) {
+            syncParam = hash.split('sync=')[1];
+        } else if (search && search.includes('sync=')) {
+            const params = new URLSearchParams(search);
+            syncParam = params.get('sync');
+        }
+
+        if (syncParam) {
+            try {
+                const importedExams = decodeSyncData(syncParam);
+                if (Array.isArray(importedExams) && importedExams.length > 0) {
+                    const shouldImport = savedExams.length === 0 || confirm(
+                        `📲 Trovati ${importedExams.length} esami dal link di sincronizzazione!\n\nVuoi importarli nel tuo calendario?`
+                    );
+
+                    if (shouldImport) {
+                        const merged = [...savedExams];
+                        importedExams.forEach(newExam => {
+                            if (!merged.some(e => e.examName === newExam.examName && e.dateStr === newExam.dateStr)) {
+                                merged.push(newExam);
+                            }
+                        });
+                        savedExams = merged;
+                        savedExams.sort((a, b) => a.timestamp - b.timestamp);
+                        localStorage.setItem('calendarioPlusExams', JSON.stringify(savedExams));
+                        renderSavedExams();
+                        alert(`✅ Sincronizzazione completata! ${importedExams.length} esami caricati sul dispositivo.`);
+                        // Puliamo l'hash dall'URL per evitare richieste ripetute
+                        history.replaceState(null, null, window.location.pathname);
+                    }
+                }
+            } catch (err) {
+                console.error("Errore durante l'importazione sincrona:", err);
+            }
+        }
     }
 });
