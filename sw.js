@@ -1,4 +1,4 @@
-const CACHE_NAME = 'calendario-plus-v6';
+const CACHE_NAME = 'calendario-plus-v7';
 const ASSETS = [
     './',
     './index.html',

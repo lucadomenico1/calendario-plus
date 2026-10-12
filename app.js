@@ -55,9 +55,12 @@ document.addEventListener('DOMContentLoaded', () => {
             // Possibili percorsi del file (permette la massima comodità di aggiornamento)
             const candidatePaths = [
                 './calendario/calendario.pdf',
+                'calendario/calendario.pdf',
+                '/calendario/calendario.pdf',
                 './calendario/ttPdf.pdf',
                 './calendario/esami.pdf',
-                './ttPdf.pdf'
+                './ttPdf.pdf',
+                '/ttPdf.pdf'
             ];
 
             let response = null;
@@ -620,6 +623,7 @@ document.addEventListener('DOMContentLoaded', () => {
                     selectProfessor(subjectInput.value, activeChip.textContent);
                 }
             }
+        });
     }
 
     // --- SINCRONIZZAZIONE DISPOSITIVI (QR CODE & LINK) ---
