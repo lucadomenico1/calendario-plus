@@ -155,11 +155,12 @@ document.addEventListener('DOMContentLoaded', () => {
     function getBadgeHtml(yearLevel) {
         if (!yearLevel || yearLevel === 'Altro') return '';
         let cls = 'badge-anno-altro';
-        if (yearLevel === '1° Anno') cls = 'badge-anno-1';
-        else if (yearLevel === '2° Anno') cls = 'badge-anno-2';
-        else if (yearLevel === '3° Anno') cls = 'badge-anno-3';
-        else if (yearLevel === 'Magistrale') cls = 'badge-anno-mag';
-        return `<span class="year-badge ${cls}">${yearLevel}</span>`;
+        let icon = '📌';
+        if (yearLevel === '1° Anno') { cls = 'badge-anno-1'; icon = '📘'; }
+        else if (yearLevel === '2° Anno') { cls = 'badge-anno-2'; icon = '📙'; }
+        else if (yearLevel === '3° Anno') { cls = 'badge-anno-3'; icon = '📗'; }
+        else if (yearLevel === 'Magistrale') { cls = 'badge-anno-mag'; icon = '🎓'; }
+        return `<span class="year-badge ${cls}">${icon} ${yearLevel}</span>`;
     }
 
     // Close autocomplete when clicking outside
@@ -247,13 +248,13 @@ document.addEventListener('DOMContentLoaded', () => {
             card.className = 'result-card fade-in';
             card.innerHTML = `
                 ${badgeHtml}
-                <h3>Appello: ${exam.dateStr}</h3>
+                <h3>📅 Appello: ${exam.dateStr}</h3>
                 <div class="info-grid">
-                    <p><strong>Ora:</strong> ${exam.ora}</p>
-                    <p><strong>Aula/Note:</strong> ${exam.aula}</p>
+                    <p><strong>⏰ Ora:</strong> ${exam.ora}</p>
+                    <p><strong>📍 Aula / Note:</strong> ${exam.aula}</p>
                 </div>
                 <button class="btn" ${isSaved ? 'disabled' : ''}>
-                    ${isSaved ? 'Già Salvato' : 'Salva Promemoria'}
+                    ${isSaved ? '✓ Già Salvato' : '📌 Salva Promemoria'}
                 </button>
             `;
 
@@ -262,7 +263,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 btn.addEventListener('click', () => {
                     saveExam(exam);
                     btn.disabled = true;
-                    btn.textContent = 'Già Salvato';
+                    btn.textContent = '✓ Già Salvato';
                 });
             }
 
@@ -547,13 +548,13 @@ document.addEventListener('DOMContentLoaded', () => {
                 ${badgeHtml}
                 <h3>${exam.examName}</h3>
                 <div class="info-grid">
-                    <p><strong>Prof:</strong> ${exam.profName}</p>
-                    <p><strong>Data:</strong> ${exam.dateStr}</p>
-                    <p><strong>Ora:</strong> ${exam.ora}</p>
-                    <p><strong>Aula:</strong> ${exam.aula}</p>
+                    <p><strong>👨‍🏫 Docente:</strong> ${exam.profName}</p>
+                    <p><strong>📅 Data:</strong> ${exam.dateStr}</p>
+                    <p><strong>⏰ Ora:</strong> ${exam.ora}</p>
+                    <p><strong>📍 Aula:</strong> ${exam.aula}</p>
                 </div>
                 ${countdownHtml}
-                <button class="btn btn-danger">Rimuovi</button>
+                <button class="btn btn-danger">🗑️ Rimuovi</button>
             `;
 
             card.querySelector('button').addEventListener('click', () => removeExam(exam.id));

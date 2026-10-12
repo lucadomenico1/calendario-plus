@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
     <title>Calendario Esami PLUS</title>
-    <link rel="stylesheet" href="style.css?v=8">
+    <link rel="stylesheet" href="style.css?v=9">
     <link rel="manifest" href="manifest.json">
     <meta name="theme-color" content="#cc1c12">
     <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js"></script>
@@ -27,12 +27,12 @@
     <main class="container">
         <!-- Loading Section -->
         <section id="upload-section" class="card" style="text-align: center;">
-            <div class="upload-area" style="border: none; background: transparent;">
+            <div class="upload-area" style="border: none; background: transparent; padding: 20px 10px;">
                 <div class="upload-label">
-                    <span class="icon">🔄</span>
-                    <span style="font-size: 1.3rem;">Inizializzazione database...</span>
+                    <div class="app-spinner"></div>
+                    <span style="font-size: 1.25rem; font-weight: 800; letter-spacing: 0.3px;">Inizializzazione database...</span>
                 </div>
-                <p id="upload-status" style="margin-top: 15px; color: var(--inner-red); font-weight: 800; font-size: 1.1rem;">Caricamento appelli in corso...</p>
+                <p id="upload-status" style="margin-top: 10px; color: var(--inner-red); font-weight: 800; font-size: 1.05rem;">Caricamento appelli in corso...</p>
             </div>
         </section>
 
@@ -116,11 +116,11 @@
 
     </main>
 
-    <script src="app.js?v=8"></script>
+    <script src="app.js?v=9"></script>
     <script>
         if ('serviceWorker' in navigator) {
             window.addEventListener('load', () => {
-                navigator.serviceWorker.register('./sw.js?v=8').then((reg) => {
+                navigator.serviceWorker.register('./sw.js?v=9').then((reg) => {
                     reg.update();
                     console.log('ServiceWorker registrato e aggiornato.', reg.scope);
                 }).catch((err) => {
