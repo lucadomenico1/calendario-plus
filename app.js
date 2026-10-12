@@ -641,21 +641,39 @@ document.addEventListener('DOMContentLoaded', () => {
             t: e.timestamp,
             m: !!e.isManual
         }));
-        return btoa(encodeURIComponent(JSON.stringify(compact)));
+        return encodeURIComponent(JSON.stringify(compact));
     }
 
     function decodeSyncData(encoded) {
-        const compact = JSON.parse(decodeURIComponent(atob(encoded)));
+        let jsonStr = '';
+        try {
+            if (encoded.trim().startsWith('[')) {
+                jsonStr = encoded;
+            } else {
+                jsonStr = decodeURIComponent(encoded);
+                if (!jsonStr.trim().startsWith('[')) {
+                    jsonStr = decodeURIComponent(atob(encoded));
+                }
+            }
+        } catch (e1) {
+            try {
+                jsonStr = atob(encoded);
+            } catch (e2) {
+                jsonStr = decodeURIComponent(encoded);
+            }
+        }
+
+        const compact = JSON.parse(jsonStr);
         return compact.map(e => ({
             id: e.id || ('sync_' + Math.random().toString(36).substr(2, 9)),
-            examName: e.n,
-            profName: e.p,
-            dateStr: e.d,
-            ora: e.o,
-            aula: e.a,
-            yearLevel: e.y || 'Altro',
-            timestamp: e.t,
-            isManual: !!e.m
+            examName: e.n || e.examName,
+            profName: e.p || e.profName,
+            dateStr: e.d || e.dateStr,
+            ora: e.o || e.ora,
+            aula: e.a || e.aula,
+            yearLevel: e.y || e.yearLevel || 'Altro',
+            timestamp: e.t || e.timestamp,
+            isManual: !!(e.m !== undefined ? e.m : e.isManual)
         }));
     }
 
@@ -666,23 +684,27 @@ document.addEventListener('DOMContentLoaded', () => {
         }
 
         const encodedData = encodeSyncData(savedExams);
-        currentSyncUrl = `${window.location.origin}${window.location.pathname}#sync=${encodedData}`;
+        currentSyncUrl = `${window.location.origin}${window.location.pathname}?sync=${encodedData}`;
 
         qrcodeContainer.innerHTML = '';
+        let qrSuccess = false;
         if (typeof QRCode !== 'undefined') {
             try {
                 new QRCode(qrcodeContainer, {
                     text: currentSyncUrl,
-                    width: 190,
-                    height: 190,
-                    colorDark: "#cc1c12",
+                    width: 200,
+                    height: 200,
+                    colorDark: "#000000",
                     colorLight: "#ffffff",
                     correctLevel: QRCode.CorrectLevel.M
                 });
+                qrSuccess = true;
             } catch (err) {
-                renderFallbackQrCode();
+                console.warn("Errore QRCode JS, uso fallback immagine:", err);
             }
-        } else {
+        }
+
+        if (!qrSuccess) {
             renderFallbackQrCode();
         }
 
@@ -692,7 +714,7 @@ document.addEventListener('DOMContentLoaded', () => {
     function renderFallbackQrCode() {
         qrcodeContainer.innerHTML = '';
         const img = document.createElement('img');
-        img.src = `https://api.qrserver.com/v1/create-qr-code/?size=200x200&color=cc1c12&data=${encodeURIComponent(currentSyncUrl)}`;
+        img.src = `https://api.qrserver.com/v1/create-qr-code/?size=220x220&color=000000&data=${encodeURIComponent(currentSyncUrl)}`;
         img.alt = "QR Code di Sincronizzazione";
         qrcodeContainer.appendChild(img);
     }
@@ -733,26 +755,28 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     function checkIncomingSync() {
-        const hash = window.location.hash;
-        const search = window.location.search;
         let syncParam = null;
+        try {
+            const url = new URL(window.location.href);
+            syncParam = url.searchParams.get('sync');
+        } catch (e) {}
 
-        if (hash && hash.includes('sync=')) {
-            syncParam = hash.split('sync=')[1];
-        } else if (search && search.includes('sync=')) {
-            const params = new URLSearchParams(search);
-            syncParam = params.get('sync');
+        if (!syncParam && window.location.hash.includes('sync=')) {
+            syncParam = window.location.hash.split('sync=')[1];
         }
 
         if (syncParam) {
             try {
                 const importedExams = decodeSyncData(syncParam);
                 if (Array.isArray(importedExams) && importedExams.length > 0) {
-                    const shouldImport = savedExams.length === 0 || confirm(
-                        `📲 Trovati ${importedExams.length} esami dal link di sincronizzazione!\n\nVuoi importarli nel tuo calendario?`
-                    );
+                    let doImport = true;
+                    if (savedExams.length > 0) {
+                        doImport = confirm(
+                            `📲 Trovati ${importedExams.length} esami dal link di sincronizzazione!\n\nVuoi aggiungerli al tuo calendario?`
+                        );
+                    }
 
-                    if (shouldImport) {
+                    if (doImport) {
                         const merged = [...savedExams];
                         importedExams.forEach(newExam => {
                             if (!merged.some(e => e.examName === newExam.examName && e.dateStr === newExam.dateStr)) {
@@ -763,9 +787,14 @@ document.addEventListener('DOMContentLoaded', () => {
                         savedExams.sort((a, b) => a.timestamp - b.timestamp);
                         localStorage.setItem('calendarioPlusExams', JSON.stringify(savedExams));
                         renderSavedExams();
-                        alert(`✅ Sincronizzazione completata! ${importedExams.length} esami caricati sul dispositivo.`);
-                        // Puliamo l'hash dall'URL per evitare richieste ripetute
-                        history.replaceState(null, null, window.location.pathname);
+
+                        // Pulizia URL pulita senza ricaricare
+                        const cleanUrl = window.location.origin + window.location.pathname;
+                        window.history.replaceState({}, document.title, cleanUrl);
+
+                        setTimeout(() => {
+                            alert(`✅ Sincronizzazione completata! ${importedExams.length} esami caricati con successo sul dispositivo.`);
+                        }, 300);
                     }
                 }
             } catch (err) {

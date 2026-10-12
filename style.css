@@ -605,3 +605,159 @@ h2 {
     max-height: 200px;
     display: block;
 }
+
+/* --- OTTIMIZZAZIONE DISPOSITIVI MOBILI (SMARTPHONE) --- */
+@media (max-width: 650px) {
+    body {
+        padding: 0;
+        overflow-x: hidden;
+    }
+
+    .container {
+        padding: 0 12px;
+        width: 100%;
+        max-width: 100vw;
+    }
+
+    header {
+        padding: 18px 0 12px 0;
+    }
+
+    .logo-title {
+        gap: 12px;
+    }
+
+    .app-logo {
+        width: 44px;
+        height: 44px;
+        border-radius: 12px;
+    }
+
+    header h1 {
+        font-size: 1.5rem;
+        line-height: 1.2;
+    }
+
+    header p {
+        font-size: 0.9rem;
+        margin-top: 2px;
+    }
+
+    .card {
+        padding: 18px 14px;
+        border-radius: 20px;
+        margin-bottom: 16px;
+    }
+
+    h2 {
+        font-size: 1.35rem;
+        margin-bottom: 14px;
+    }
+
+    .saved-header {
+        flex-direction: column;
+        align-items: stretch;
+        gap: 12px;
+    }
+
+    .saved-header h2 {
+        text-align: center;
+    }
+
+    .saved-actions {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 8px;
+        width: 100%;
+    }
+
+    .btn-action {
+        width: 100% !important;
+        padding: 10px 8px !important;
+        font-size: 0.8rem !important;
+        text-align: center;
+        justify-content: center;
+        display: flex !important;
+        align-items: center;
+    }
+
+    .btn-clear {
+        grid-column: span 2;
+        padding: 9px !important;
+    }
+
+    .results-container, .saved-container {
+        max-height: 520px;
+        gap: 12px;
+    }
+
+    .result-card, .saved-exam-card {
+        padding: 16px;
+        border-radius: 16px;
+    }
+
+    .result-card h3, .saved-exam-card h3 {
+        font-size: 1.15rem;
+        margin-bottom: 10px;
+    }
+
+    .info-grid {
+        gap: 8px;
+        margin-bottom: 14px;
+    }
+
+    .info-grid p {
+        font-size: 0.95rem;
+    }
+
+    .countdown-box {
+        gap: 8px;
+        margin: 12px 0;
+    }
+
+    .cd-item {
+        padding: 8px;
+        border-radius: 12px;
+    }
+
+    .cd-item .num {
+        font-size: 1.6rem;
+    }
+
+    .cd-item .label {
+        font-size: 0.75rem;
+    }
+
+    .btn {
+        padding: 11px 16px;
+        font-size: 0.95rem;
+        border-radius: 14px;
+    }
+
+    #subject-input, .custom-input {
+        padding: 13px 16px;
+        font-size: 1rem;
+        border-radius: 14px;
+    }
+
+    .modal-content {
+        padding: 20px 14px;
+        border-radius: 20px;
+        max-width: 95%;
+        margin: 10px;
+    }
+
+    .modal-header h3 {
+        font-size: 1.15rem;
+    }
+
+    .qrcode-wrapper {
+        padding: 12px;
+        border-radius: 14px;
+    }
+
+    .qrcode-wrapper img, .qrcode-wrapper canvas {
+        max-width: 180px;
+        max-height: 180px;
+    }
+}

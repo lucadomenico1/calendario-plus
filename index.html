@@ -2,9 +2,9 @@
 <html lang="it">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
     <title>Calendario Esami PLUS</title>
-    <link rel="stylesheet" href="style.css?v=7">
+    <link rel="stylesheet" href="style.css?v=8">
     <link rel="manifest" href="manifest.json">
     <meta name="theme-color" content="#cc1c12">
     <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js"></script>
@@ -116,11 +116,11 @@
 
     </main>
 
-    <script src="app.js?v=7"></script>
+    <script src="app.js?v=8"></script>
     <script>
         if ('serviceWorker' in navigator) {
             window.addEventListener('load', () => {
-                navigator.serviceWorker.register('./sw.js?v=7').then((reg) => {
+                navigator.serviceWorker.register('./sw.js?v=8').then((reg) => {
                     reg.update();
                     console.log('ServiceWorker registrato e aggiornato.', reg.scope);
                 }).catch((err) => {
